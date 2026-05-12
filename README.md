@@ -42,9 +42,11 @@ original upstream script has been removed from this fork.
 
 The simple way: just run the script with all input parameters and
 the output file as the final parameter. You can mix still images,
-video clips and audio tracks. The two first kinds of inputs would
-become slides in the defined order. The audio files would become
-the background track, also in the defined order.
+video clips and audio tracks. Supported video extensions include
+`.mp4`, `.mpg`, `.avi`, and `.3gp`, as long as your FFmpeg build can
+decode the file. The two first kinds of inputs would become slides in
+the defined order. The audio files would become the background track,
+also in the defined order.
 
 ```
 ./kburns.rb 001.JPG please.mp4 002.JPG 002b.mp4 004.JPG 005.JPG asfalto.mp3 "09 My way.mp3" out.mkv
