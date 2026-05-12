@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'fastimage'
+require 'open3'
 require 'optparse'
 require 'ostruct'
 require 'thread/pool'
@@ -216,6 +217,35 @@ def generate_srt_file(slides)
   end
 end
 
+def ffprobe_capture(file, *args)
+  stdout, stderr, status = Open3.capture3("ffprobe", *args, file)
+  unless status.success?
+    warn "ffprobe failed for #{file}: #{stderr.strip}"
+    raise "Could not probe #{file}"
+  end
+
+  stdout.strip
+end
+
+def video_duration_s(file)
+  ffprobe_capture(
+      file,
+      "-show_entries", "format=duration",
+      "-v", "error",
+      "-of", "default=noprint_wrappers=1:nokey=1"
+  ).to_f
+end
+
+def has_audio_stream?(file)
+  !ffprobe_capture(
+      file,
+      "-select_streams", "a",
+      "-show_entries", "stream=index",
+      "-v", "error",
+      "-of", "csv=p=0"
+  ).empty?
+end
+
 ################################################################################
 
 if $options.zoom_direction == "random"
@@ -235,14 +265,14 @@ slides = []
 background_tracks = []
 input_files.each do |file|
   if VIDEO_EXTENSIONS.include? file.downcase.rpartition(".").last
-    duration = `ffprobe -show_entries format=duration -v error -of default=noprint_wrappers=1:nokey=1 #{file}`
+    duration_s = video_duration_s(file)
     this_offset_s = current_offset_s
-    current_offset_s = current_offset_s + duration.to_f - $options.fade_duration_s
+    current_offset_s = current_offset_s + duration_s - $options.fade_duration_s
     slides << {
         video: true,
-        hasaudio: true,
+        hasaudio: has_audio_stream?(file),
         file: file,
-        duration_s: duration.to_f,
+        duration_s: duration_s,
         offset_s: this_offset_s
     }
   elsif IMAGE_EXTENSIONS.include? file.downcase.rpartition(".").last
