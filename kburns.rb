@@ -246,6 +246,14 @@ def has_audio_stream?(file)
   ).empty?
 end
 
+def boxed_video_filters
+  [
+      "scale=w=#{$options.output_width}:h=#{$options.output_height}:force_original_aspect_ratio=decrease",
+      "pad=w=#{$options.output_width}:h=#{$options.output_height}:x='(ow-iw)/2':y='(oh-ih)/2':color=black",
+      "setsar=1"
+  ]
+end
+
 ################################################################################
 
 if $options.zoom_direction == "random"
@@ -553,7 +561,7 @@ filter_chains += slides.each_with_index.map do |slide, i|
   filters = []
 
   if slide[:video]
-    filters << "scale=w=#{$options.output_width}:h=-1"
+    filters.concat(boxed_video_filters)
   end
 
   # Fade filter
