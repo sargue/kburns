@@ -677,7 +677,12 @@ filter_chains << background_sections.each_with_index.map do |section, i|
 end
 
 # audio mix
-filter_chains << audio_tracks.join('') + "amix=inputs=" + audio_tracks.length.to_s + "[aout]"
+#
+# FFmpeg's amix defaults to normalize=1, which divides the output by the
+# number of inputs. Most inputs here are delayed clips that are silent for much
+# of the timeline, but they still count as inputs, making large jobs nearly
+# inaudible.
+filter_chains << audio_tracks.join('') + "amix=inputs=" + audio_tracks.length.to_s + ":normalize=0[aout]"
 
 if $options.verbose
   puts("FINAL AUDIO, CHAINS:")
