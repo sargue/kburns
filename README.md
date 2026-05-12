@@ -28,9 +28,15 @@ So back to the editor I had to break down the process into multiple
 `ffmpeg` executions and intermediate files before muxing it all back
 together.
 
-The `kburns2.rb` is the result of this work. Still unstable, not
-documented, not tested, etc. I even don't know Ruby, first time using
-it.
+The extended implementation is now the main `kburns.rb` script. The
+original upstream script has been removed from this fork.
+
+## Requirements
+
+* Ruby
+* FFmpeg and `ffprobe`
+* Ruby gems: `fastimage` and `thread/pool`
+* `Inter-ExtraBold.otf` in the repository root for generated title slides
 
 ## How to use
 
@@ -41,7 +47,7 @@ become slides in the defined order. The audio files would become
 the background track, also in the defined order.
 
 ```
-kburns2.rb 001.JPG please.mp4 002.JPG 002b.mp4 004.JPG 005.JPG asfalto.mp3 "09 My way.mp3" out.mkv
+./kburns.rb 001.JPG please.mp4 002.JPG 002b.mp4 004.JPG 005.JPG asfalto.mp3 "09 My way.mp3" out.mkv
 ```
 
 You can also get some verbose information about the process with
@@ -69,5 +75,8 @@ up to two lines of text repeating the same prefix.
 Example:
 
 ```
-kburns2.rb --verbose --subtitles=subs.txt 001.JPG please.mp4 002.JPG 002b.mp4 004.JPG asfalto.mp3 out.mkv
+./kburns.rb --verbose --subtitles=subs.txt 001.JPG please.mp4 002.JPG 002b.mp4 004.JPG asfalto.mp3 out.mkv
 ```
+
+Temporary `temp-kburns*` files are reused between runs. Add
+`--delete-temp-files` to remove them when the script exits.

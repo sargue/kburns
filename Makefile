@@ -1,4 +1,4 @@
-KBURNS=./kburns.rb --dump-filter-graph
+KBURNS=./kburns.rb
 
 all:
 
