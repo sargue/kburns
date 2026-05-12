@@ -717,12 +717,17 @@ end
 # Final mux
 #
 
+subtitle_file = "temp-kburns-subs.srt"
+include_subtitles = $options.subs_file && File.exist?(subtitle_file) && !File.empty?(subtitle_file)
+
 cmd = [
     "ffmpeg", "-hide_banner", "-y",
     "-i", final_video_file,
     "-i", final_audio_file,
-    *(File.empty?("temp-kburns-subs.srt") ? [] : ["-i", "temp-kburns-subs.srt"]),
-    "-c", "copy", "-disposition:s:0", "default", output_file
+    *(include_subtitles ? ["-i", subtitle_file] : []),
+    "-c", "copy",
+    *(include_subtitles ? ["-disposition:s:0", "default"] : []),
+    output_file
 ]
 
 if $options.verbose
